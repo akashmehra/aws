@@ -2,6 +2,7 @@
 import boto
 import boto.ec2 as ec2
 import time,os,sys,json
+num_tries = 12
  
  
 # amis are located here: http://cloud-images.ubuntu.com/releases/14.04/release/
@@ -22,8 +23,10 @@ def instance_state(instance):
     return instance.state
  
 def poll_aws_for_instance_state(instances, finalState, sleepTime):
+    global num_tries
+    tries = num_tries
     conditionSatisfied = False
-    while not conditionSatisfied:
+    while not conditionSatisfied and num_tries >= 0:
         instanceStatesPred = [instance_state(instance) == finalState for instance in instances]
         conditionSatisfied = instanceStatesPred[0]
         for idx,pred in enumerate(instanceStatesPred):
@@ -33,14 +36,15 @@ def poll_aws_for_instance_state(instances, finalState, sleepTime):
         if not conditionSatisfied:
             print 'Will sleep for {0} seconds before polling AWS again.'.format(sleepTime)
             time.sleep(10)
+            num_tries -= 1
  
-def save_instance_dns(instances,region):
-    f = open(os.path.join(os.environ['HOME'],'hosts-'+region),'w')
+def save_instance_dns(instances,hosts_file_name):
+    f = open(os.path.join(os.environ['HOME'],hosts_file_name),'w')
     f.writelines([instance.public_dns_name+'\n' for instance in instances])
     f.close()
  
-def save_instance_ids(instances,region):
-    f = open(os.path.join(os.environ['HOME'],'instance-ids-'+region),'w')
+def save_instance_ids(instances,instance_ids_file_name):
+    f = open(os.path.join(os.environ['HOME'],instance_ids_file_name),'w')
     f.writelines([instance.id+'\n' for instance in instances])
     f.close()
  
@@ -48,7 +52,7 @@ def tag_instance(instances,key,value):
     for instance in instances:
         instance.add_tag(key,value)
  
-def create_instances(conn,region,ami_id,instance_type,key_pair_name,min_count,max_count,nameTag, security_group_ids):
+def create_instances(conn,region,ami_id,instance_type,key_pair_name,min_count,max_count,nameTag, security_group_ids, hosts_file_name, instance_ids_file_name):
     new_reservation = conn.run_instances(ami_id,instance_type=instance_type, 
                                      min_count=min_count,max_count=max_count,
                                      key_name=key_pair_name, security_group_ids=security_group_ids)
@@ -60,8 +64,8 @@ def create_instances(conn,region,ami_id,instance_type,key_pair_name,min_count,ma
     print 'Instance details: \n'
     for instance in instances:
         print '{0}:{1}'.format(instance.id, instance.public_dns_name)
-    save_instance_dns(instances,region)
-    save_instance_ids(instances,region)
+    save_instance_dns(instances,hosts_file_name)
+    save_instance_ids(instances,instance_ids_file_name)
     print 'Tagging the instances...'
     time.sleep(sleepTime)
     tag_instance(instances,'Name',nameTag)
@@ -98,7 +102,8 @@ def main(region,config_file):
 
     min_count = region_info['count']
     max_count = region_info['count']
-    instances = create_instances(conn,region,region_info['ami_id'],instance_type,region_info['key_pair_name'],min_count,max_count,config['tag'],[security_group.id])
+    instances = create_instances(conn,region,region_info['ami_id'],instance_type,region_info['key_pair_name'],min_count,max_count,config['tag'],
+                                [security_group.id],region_info['hosts_file_name'],region_info['instance_ids_file_name'])
 
 if __name__ == '__main__':
     if len(sys.argv) == 3:
