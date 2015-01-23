@@ -6,10 +6,10 @@ env.user = 'ubuntu'
 
 @parallel
 def nbserver():
-	run('tmux new -s itorch -d "cd $HOME/demos && nohup itorch notebook --ip=* --no-browser"')
+	run('tmux new -s itorch -d "cd $HOME/next.ml && nohup itorch notebook --ip=* --no-browser"')
 
 @task
-def start_nbserver(region,key_file,hosts_file):
+def start_nbserver(region,key_file):
   env.key_filename = [key_file]
   env.hosts = [host.replace('\n','').replace('\r','') for host in open(hosts_file).readlines()]
   execute(nbserver)

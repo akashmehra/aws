@@ -39,12 +39,12 @@ def poll_aws_for_instance_state(instances, finalState, sleepTime):
             num_tries -= 1
  
 def save_instance_dns(instances,hosts_file_name):
-    f = open(os.path.join(os.environ['HOME'],hosts_file_name),'w')
+    f = open(os.path.join(os.environ['HOME'],hosts_file_name),'a')
     f.writelines([instance.public_dns_name+'\n' for instance in instances])
     f.close()
  
 def save_instance_ids(instances,instance_ids_file_name):
-    f = open(os.path.join(os.environ['HOME'],instance_ids_file_name),'w')
+    f = open(os.path.join(os.environ['HOME'],instance_ids_file_name),'a')
     f.writelines([instance.id+'\n' for instance in instances])
     f.close()
  
