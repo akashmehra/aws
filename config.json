@@ -6,10 +6,10 @@
                       "description": "<security-group-description>",
                       "rules": [
                                   {
-                                    "ip_protocol":"ipv4",
+                                    "ip_protocol":"TCP",
                                     "from_port":8080,
                                     "to_port":8080,
-                                    "source":"0.0.0.0"
+                                    "source":"0.0.0.0/0"
                                   }
                               ],
                     },
