@@ -2,15 +2,39 @@
   "AWS_ACCESS_KEY": "<your-aws-access-key>",
   "AWS_SECRET_KEY": "<your-aws-secret-key>",
   "security_group": {
-                      "name":"<security-group-name>",
-                      "description": "<security-group-description>",
+                      "name":"itorch",
+                      "description": "security group for running itorch on aws ec2.",
                       "rules": [
                                   {
                                     "ip_protocol":"TCP",
                                     "from_port":8080,
                                     "to_port":8080,
                                     "source":"0.0.0.0/0"
-                                  }
+                                  },
+                                  {
+                                    "ip_protocol":"TCP",
+                                    "from_port":8888,
+                                    "to_port":8080,
+                                    "source":"0.0.0.0/0"
+                                  },
+                                  {
+                                    "ip_protocol":"TCP",
+                                    "from_port":22,
+                                    "to_port":22,
+                                    "source":"0.0.0.0/0"
+                                  },
+                                  {
+                                    "ip_protocol":"TCP",
+                                    "from_port":80,
+                                    "to_port":80,
+                                    "source":"0.0.0.0/0"
+                                  },
+                                  {
+                                    "ip_protocol":"TCP",
+                                    "from_port":443,
+                                    "to_port":443,
+                                    "source":"0.0.0.0/0"
+                                  },
                               ],
                     },
   "us-east-1":{
