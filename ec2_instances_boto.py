@@ -2,6 +2,7 @@
 import boto
 import boto.ec2 as ec2
 import time,os,sys,json
+import simplejson
 num_tries = 12
  
  
@@ -39,12 +40,12 @@ def poll_aws_for_instance_state(instances, finalState, sleepTime):
             num_tries -= 1
  
 def save_instance_dns(instances,hosts_file_name):
-    f = open(os.path.join(os.environ['HOME'],hosts_file_name),'a')
+    f = open(os.path.join(os.path.dirname(os.path.realpath(__file__)),hosts_file_name),'a')
     f.writelines([instance.public_dns_name+'\n' for instance in instances])
     f.close()
  
 def save_instance_ids(instances,instance_ids_file_name):
-    f = open(os.path.join(os.environ['HOME'],instance_ids_file_name),'a')
+    f = open(os.path.join(os.path.dirname(os.path.realpath(__file__)),instance_ids_file_name),'a')
     f.writelines([instance.id+'\n' for instance in instances])
     f.close()
  
@@ -82,7 +83,7 @@ def authorize_rule(sg,ip_protocol,from_port,to_port,source):
         pass
 
 def main(region,config_file):
-    config = json.loads(open(config_file).read())
+    config = simplejson.loads(open(config_file).read())
     aws_access_key = config['AWS_ACCESS_KEY']
     aws_secret_key = config['AWS_SECRET_KEY']
     group_name = config['security_group']['name']
@@ -102,7 +103,13 @@ def main(region,config_file):
 
     min_count = region_info['count']
     max_count = region_info['count']
-    instances = create_instances(conn,region,region_info['ami_id'],instance_type,region_info['key_pair_name'],min_count,max_count,config['tag'],
+    key_pair_name = region_info['key_pair_name']
+    key_pair = conn.get_key_pair(key_pair_name)
+    if not key_pair:
+        key_pair = conn.create_key_pair(key_pair_name)
+        key_pair.save(os.path.dirname(os.path.realpath(__file__)))
+
+    instances = create_instances(conn,region,region_info['ami_id'],instance_type,key_pair_name,min_count,max_count,config['tag'],
                                 [security_group.id],region_info['hosts_file_name'],region_info['instance_ids_file_name'])
 
 if __name__ == '__main__':
