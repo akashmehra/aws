@@ -15,5 +15,5 @@ Let's you launch multiple instances across regions using EC2.
 * To start itorch notebook on each server, pass the ```hosts_file``` (created in the step above) as an argument to the fabfile. Execute ```fab start_nbserver:key_file=<pem-file>.pem,hosts_file=ec2-torch-hosts``` from the directory containing the fabfile.
 
 ### Killing iTorch Notebook:
-* To kill itorch notebook on each server, pass the ```hosts_file``` (created in the step above) as an argument to the fabfile. Execute ```fab kill_nbserver:key_file=<pem-file>.pem,hosts_file=ec2-torch-hosts``` from the directory containing the fabfile.
+* To kill itorch notebook on each server, pass the ```hosts_file``` (created in the step above) as an argument to the fabfile. Execute ```fab stop_nbserver:key_file=<pem-file>.pem,hosts_file=ec2-torch-hosts``` from the directory containing the fabfile.
 
