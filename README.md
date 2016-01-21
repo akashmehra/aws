@@ -1,5 +1,6 @@
 # AWS EC2
-aws-boto code.
+Code to interact with AWS EC2.
+Using boto and fabric for aws and remote host management.
 <br>
 Let's you launch multiple instances across regions using EC2.
 <br>
